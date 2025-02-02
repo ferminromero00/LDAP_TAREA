@@ -1,0 +1,78 @@
+# Usar una imagen base de Amazon Linux 2
+FROM amazonlinux:2
+
+# Actualizar el sistema operativo
+RUN yum update -y
+
+# Instalar Apache, Node.js, Git y otros paquetes necesarios
+RUN yum install -y httpd git mod_ssl curl
+
+# Eliminar archivos existentes en /var/www/html
+RUN rm -rf /var/www/html/*
+
+# Clonar el repositorio
+RUN git clone https://github.com/ferminromero00/LDAP_TAREA.git /var/www/html/LDAP_TAREA
+
+# Mover los archivos necesarios a /var/www/html
+RUN mv /var/www/html/LDAP_TAREA/* /var/www/html/*
+
+# Configurar permisos para la web
+RUN chown -R apache:apache /var/www/html && \
+    chmod -R 755 /var/www/html
+
+# Copiar certificados SSL
+COPY certificate.crt /etc/pki/tls/certs/
+COPY private.key /etc/pki/tls/private/
+COPY ca_bundle.crt /etc/pki/tls/certs/
+
+# Eliminar archivo de configuración SSL predeterminado que causa el error
+RUN rm -f /etc/httpd/conf.d/ssl.conf
+
+# Crear archivo de configuración SSL para Apache
+RUN cat <<EOF > /etc/httpd/conf.d/ssl-vhost.conf
+<VirtualHost *:443>
+    DocumentRoot "/var/www/html"
+    ServerName tienda-videojuegos.work.gd
+
+    SSLEngine on
+    SSLCertificateFile /etc/pki/tls/certs/certificate.crt
+    SSLCertificateKeyFile /etc/pki/tls/private/private.key
+    SSLCertificateChainFile /etc/pki/tls/certs/ca_bundle.crt
+
+    SSLProtocol all -SSLv3 -TLSv1 -TLSv1.1
+    SSLCipherSuite HIGH:!aNULL:!MD5
+    SSLHonorCipherOrder on
+
+    <Directory "/var/www/html">
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog /var/log/httpd/ssl_error.log
+    CustomLog /var/log/httpd/ssl_access.log combined
+</VirtualHost>
+EOF
+
+# Redirigir HTTP a HTTPS en el puerto 80
+RUN cat <<EOF > /etc/httpd/conf.d/redirect-http-to-https.conf
+<VirtualHost *:80>
+    DocumentRoot "/var/www/html"
+    ServerName tienda-videojuegos.work.gd
+
+    <Directory "/var/www/html">
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    Redirect permanent / https://tienda-videojuegos.work.gd/
+
+    ErrorLog /var/log/httpd/http_error.log
+    CustomLog /var/log/httpd /http_access.log combined
+</VirtualHost>
+EOF
+
+# Exponer los puertos 80 y 443
+EXPOSE 80 443
+
+# Iniciar Apache en primer plano
+CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
