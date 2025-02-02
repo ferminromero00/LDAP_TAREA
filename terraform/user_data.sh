@@ -8,27 +8,15 @@ sudo mkdir /var/web
 
 cd /var
 sudo git clone https://github.com/ferminromero00/LDAP_TAREA.git
-sudo mv Despliegue-TiendaOnline/src/dockerfile web
+sudo mv Despliegue-TiendaOnline/Dockerfiles/dockerfile_web web
 sudo rm -r Despliegue-TiendaOnline
-
-#Actualizar IP del domninio
-sudo curl https://api.dnsexit.com/dns/ud/?apikey=68OTW9l2eMS67w7jw6bQzm4hh91sVw -d host=tienda-videojuegos.work.gd
 
 #Instalar docker
 sudo dnf install docker -y
 sudo systemctl start docker
 
-#Hacer el build de nuestro dockerfile para que funcione la web
-cd /var/
-sudo mv ca_bundle.crt web
-sudo mv private.key web
-sudo mv certificate.crt web
-
 cd web
-docker build -t proyecto-tienda-online .
-docker run -it --name proyecto-tienda-online -p 80:80 -p 443:443 -p 3000:3000 -d proyecto-tienda-online
+docker build -t restaurante .
+docker run -it --name restaurante -p 80:80 -p 443:443 -d restaurante
 
-sudo rm /var/web/certificate.crt
-sudo rm /var/web/private.key
-sudo rm /var/web/ca_bundle.crt
 
