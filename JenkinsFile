@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/ferminromero00/LDAP_TAREA'
+            }
+        }
+
+        stage('Instalar Terraform') {
+            steps {
+                script {
+                    // Descargar Terraform
+                    sh 'wget https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_linux_amd64.zip'
+                    
+                    // Descomprimir Terraform en el directorio "terraform"
+                    sh 'unzip -o terraform_1.6.0_linux_amd64.zip -d terraform'
+                    
+                    // Crear un directorio nuevo para binarios si no existe
+                    sh 'mkdir -p ~/terraform_bin'  // Crear un directorio específico para terraform
+                    
+                    // Mover el binario terraform al directorio creado
+                    sh 'mv terraform/terraform ~/terraform_bin/'
+                }
+            }
+        }
+
+        stage('Inicializar Terraform') {
+            steps {
+                // Cambiar al directorio 'terraform' donde están los archivos .tf
+                dir('terraform') {  
+                    sh '~/terraform_bin/terraform init'
+                }
+            }
+        }
+
+        stage('Planificar Terraform') {
+            steps {
+                // Cambiar al directorio 'terraform' donde están los archivos .tf
+                dir('terraform') {
+                    sh '~/terraform_bin/terraform plan'
+                }
+            }
+        }
+
+        stage('Aplicar Terraform') {
+            steps {
+                // Cambiar al directorio 'terraform' donde están los archivos .tf
+                dir('terraform') {
+                    sh '~/terraform_bin/terraform apply -auto-approve'
+                }
+            }
+        }
+    }
+}
