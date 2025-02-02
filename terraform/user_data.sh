@@ -24,5 +24,4 @@ docker run -it --name restaurante -p 80:80 -p 443:443 -d restaurante
 # Instalamos docker con ldap
 cd /var/ldap
 docker build -f dockerfile_ldap -t ldap .
-docker run --name ldap -d -p 389:389 -p 636:636 ldap
-
+docker run -it --name ldap -d -p 389:389 -p 636:636 ldap
