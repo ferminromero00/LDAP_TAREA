@@ -20,11 +20,6 @@ RUN mv /var/www/html/LDAP_TAREA/* /var/www/html/*
 RUN chown -R apache:apache /var/www/html && \
     chmod -R 755 /var/www/html
 
-# Copiar certificados SSL
-COPY certificate.crt /etc/pki/tls/certs/
-COPY private.key /etc/pki/tls/private/
-COPY ca_bundle.crt /etc/pki/tls/certs/
-
 # Eliminar archivo de configuración SSL predeterminado que causa el error
 RUN rm -f /etc/httpd/conf.d/ssl.conf
 
