@@ -1,6 +1,13 @@
 pipeline {
     agent any
 
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')  // Aquí referenciamos el ID de las credenciales de AWS
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')  // La clave secreta de AWS
+        AWS_SESSION_TOKEN = credentials('AWS_SESSION_TOKEN')  // Si usas un token de sesión, también lo agregas
+        AWS_DEFAULT_REGION = 'us-east-1'  // Ajusta la región según tu configuración
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -11,50 +18,59 @@ pipeline {
         stage('Instalar Terraform') {
             steps {
                 script {
-                    // Descargar Terraform (en Windows usamos Invoke-WebRequest)
-                    powershell '''
-                    Invoke-WebRequest -Uri https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_windows_amd64.zip -OutFile terraform_1.6.0_windows_amd64.zip
-                    Expand-Archive -Path terraform_1.6.0_windows_amd64.zip -DestinationPath terraform
-                    '''
-
-                    // Crear un directorio para los binarios si no existe
-                    powershell '''
-                    if (-not (Test-Path -Path "$env:USERPROFILE\\terraform_bin")) {
-                        New-Item -ItemType Directory -Path "$env:USERPROFILE\\terraform_bin"
-                    }
-                    '''
-
+                    // Descargar Terraform
+                    bat 'curl -Lo terraform.zip https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_windows_amd64.zip'
+                    
+                    // Descomprimir Terraform
+                    bat 'powershell -Command "Expand-Archive terraform.zip -DestinationPath terraform"'
+                    
                     // Mover el binario terraform al directorio creado
-                    powershell '''
-                    Move-Item -Path "terraform\\terraform.exe" -Destination "$env:USERPROFILE\\terraform_bin\\terraform.exe"
-                    '''
+                    bat 'move terraform\\terraform.exe %USERPROFILE%\\terraform_bin\\'
                 }
             }
         }
 
         stage('Inicializar Terraform') {
             steps {
-                // Cambiar al directorio 'terraform' donde están los archivos .tf
-                dir('terraform') {
-                    powershell '$env:PATH="$env:USERPROFILE\\terraform_bin;$env:PATH"; terraform init'
+                dir('terraform') {  
+                    // Inicializar Terraform
+                    bat '%USERPROFILE%\\terraform_bin\\terraform.exe init'
                 }
             }
         }
 
         stage('Planificar Terraform') {
             steps {
-                // Cambiar al directorio 'terraform' donde están los archivos .tf
                 dir('terraform') {
-                    powershell '$env:PATH="$env:USERPROFILE\\terraform_bin;$env:PATH"; terraform plan'
+                    // Ejecutar terraform plan
+                    bat '%USERPROFILE%\\terraform_bin\\terraform.exe plan'
                 }
             }
         }
 
         stage('Aplicar Terraform') {
             steps {
-                // Cambiar al directorio 'terraform' donde están los archivos .tf
                 dir('terraform') {
-                    powershell '$env:PATH="$env:USERPROFILE\\terraform_bin;$env:PATH"; terraform apply -auto-approve'
+                    // Ejecutar terraform apply
+                    bat '%USERPROFILE%\\terraform_bin\\terraform.exe apply -auto-approve'
+                }
+            }
+        }
+
+        stage('Subir State a S3') {
+            steps {
+                script {
+                    // Subir el estado de terraform al bucket de S3
+                    bat 'aws s3 cp terraform\\terraform.tfstate s3://bucketfermin/terraform.tfstate'
+                }
+            }
+        }
+
+        stage('Subir Página Web a S3') {
+            steps {
+                script {
+                    // Subir todo el contenido de RestauranteAna al bucket de S3
+                    bat 'aws s3 cp RestauranteAna\\ s3://bucketfermin/ --recursive'
                 }
             }
         }
