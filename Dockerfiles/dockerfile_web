@@ -23,51 +23,8 @@ RUN chown -R apache:apache /var/www/html && \
 # Eliminar archivo de configuración SSL predeterminado que causa el error
 RUN rm -f /etc/httpd/conf.d/ssl.conf
 
-# Crear archivo de configuración SSL para Apache
-RUN cat <<EOF > /etc/httpd/conf.d/ssl-vhost.conf
-<VirtualHost *:443>
-    DocumentRoot "/var/www/html"
-    ServerName tienda-videojuegos.work.gd
-
-    SSLEngine on
-    SSLCertificateFile /etc/pki/tls/certs/certificate.crt
-    SSLCertificateKeyFile /etc/pki/tls/private/private.key
-    SSLCertificateChainFile /etc/pki/tls/certs/ca_bundle.crt
-
-    SSLProtocol all -SSLv3 -TLSv1 -TLSv1.1
-    SSLCipherSuite HIGH:!aNULL:!MD5
-    SSLHonorCipherOrder on
-
-    <Directory "/var/www/html">
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    ErrorLog /var/log/httpd/ssl_error.log
-    CustomLog /var/log/httpd/ssl_access.log combined
-</VirtualHost>
-EOF
-
-# Redirigir HTTP a HTTPS en el puerto 80
-RUN cat <<EOF > /etc/httpd/conf.d/redirect-http-to-https.conf
-<VirtualHost *:80>
-    DocumentRoot "/var/www/html"
-    ServerName tienda-videojuegos.work.gd
-
-    <Directory "/var/www/html">
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    Redirect permanent / https://tienda-videojuegos.work.gd/
-
-    ErrorLog /var/log/httpd/http_error.log
-    CustomLog /var/log/httpd /http_access.log combined
-</VirtualHost>
-EOF
-
 # Exponer los puertos 80 y 443
-EXPOSE 80 443
+EXPOSE 80
 
 # Iniciar Apache en primer plano
 CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
