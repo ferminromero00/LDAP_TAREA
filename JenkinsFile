@@ -11,17 +11,23 @@ pipeline {
         stage('Instalar Terraform') {
             steps {
                 script {
-                    // Descargar Terraform
-                    sh 'wget https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_linux_amd64.zip'
-                    
-                    // Descomprimir Terraform en el directorio "terraform"
-                    sh 'unzip -o terraform_1.6.0_linux_amd64.zip -d terraform'
-                    
-                    // Crear un directorio nuevo para binarios si no existe
-                    sh 'mkdir -p ~/terraform_bin'  // Crear un directorio específico para terraform
-                    
+                    // Descargar Terraform (en Windows usamos Invoke-WebRequest)
+                    powershell '''
+                    Invoke-WebRequest -Uri https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_windows_amd64.zip -OutFile terraform_1.6.0_windows_amd64.zip
+                    Expand-Archive -Path terraform_1.6.0_windows_amd64.zip -DestinationPath terraform
+                    '''
+
+                    // Crear un directorio para los binarios si no existe
+                    powershell '''
+                    if (-not (Test-Path -Path "$env:USERPROFILE\\terraform_bin")) {
+                        New-Item -ItemType Directory -Path "$env:USERPROFILE\\terraform_bin"
+                    }
+                    '''
+
                     // Mover el binario terraform al directorio creado
-                    sh 'mv terraform/terraform ~/terraform_bin/'
+                    powershell '''
+                    Move-Item -Path "terraform\\terraform.exe" -Destination "$env:USERPROFILE\\terraform_bin\\terraform.exe"
+                    '''
                 }
             }
         }
@@ -29,8 +35,8 @@ pipeline {
         stage('Inicializar Terraform') {
             steps {
                 // Cambiar al directorio 'terraform' donde están los archivos .tf
-                dir('terraform') {  
-                    sh '~/terraform_bin/terraform init'
+                dir('terraform') {
+                    powershell '$env:PATH="$env:USERPROFILE\\terraform_bin;$env:PATH"; terraform init'
                 }
             }
         }
@@ -39,7 +45,7 @@ pipeline {
             steps {
                 // Cambiar al directorio 'terraform' donde están los archivos .tf
                 dir('terraform') {
-                    sh '~/terraform_bin/terraform plan'
+                    powershell '$env:PATH="$env:USERPROFILE\\terraform_bin;$env:PATH"; terraform plan'
                 }
             }
         }
@@ -48,7 +54,7 @@ pipeline {
             steps {
                 // Cambiar al directorio 'terraform' donde están los archivos .tf
                 dir('terraform') {
-                    sh '~/terraform_bin/terraform apply -auto-approve'
+                    powershell '$env:PATH="$env:USERPROFILE\\terraform_bin;$env:PATH"; terraform apply -auto-approve'
                 }
             }
         }
