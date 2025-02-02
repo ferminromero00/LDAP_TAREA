@@ -58,7 +58,6 @@ resource "aws_key_pair" "ssh_servidor_apache" {
 
 # Instancia EC2 para el Servidor Web
 resource "aws_instance" "servidor_web" {
-  count                       = 2
   ami                         = var.ami_id
   instance_type               = var.instance_type
   subnet_id                   = aws_subnet.subred_publica.id
@@ -66,9 +65,10 @@ resource "aws_instance" "servidor_web" {
   vpc_security_group_ids      = [aws_security_group.grupo_seguridad_servidor.id]
   associate_public_ip_address = true
 
+
   user_data = file("user_data.sh")
 
   tags = {
-    Name = "ServidorWeb-${count.index + 1}"
+    Name = "ServidorWeb"
   }
 }
