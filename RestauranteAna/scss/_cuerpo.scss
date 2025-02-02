@@ -1,0 +1,287 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: $color-dark;
+}
+
+.left-img {
+    width: 300px;
+}
+
+.navbar {
+    position: relative;
+    z-index: 1;
+
+    &-navigation {
+        display: flex;
+
+        &-left {
+            width: 50vw;
+            height: 100vh;
+            background-color: $color-dark;
+            position: fixed;
+            left: -50vw;
+            transition: left 0.8s;
+
+            .left-img {
+                position: absolute;
+                width: 50%;
+                box-shadow: 0 15px 60px rgba($color-black , $alpha: 0.4);
+                opacity: 0.7;
+                border-radius: 10px;
+            }
+
+            .left-img-1 {
+                top: 15%;
+                left: 15%;
+            }
+
+            .left-img-2 {
+                top: 35%;
+                left: 25%;
+            }
+
+            .left-img-3 {
+                top: 55%;
+                left: 35%;
+            }
+        }
+
+        &-right {
+            width: 50vw;
+            height: 100vh;
+            background-color: #1f1d1d;
+            position: fixed;
+            right: -50vw;
+            @include flexLayout;
+            transition: right 0.8s;
+
+            .nav-list {
+                &-item {
+                    list-style: none;
+                }
+
+                &-link {
+                    font-family: $font-dancingScript;
+                    font-size: 50px;
+                    @include textStyle(capitalize);
+                    color: $color-secondary;
+                    text-decoration: none;
+                    display: block;
+                    margin: 20px;
+                    text-align: center;
+
+                    &:hover {
+                        color: $color-primary;
+                    }
+                }
+            }
+        }
+    }
+
+    .checkbox:checked~.navbar-navigation .navbar-navigation-left {
+        left: 0;
+    }
+
+    .checkbox:checked~.navbar-navigation .navbar-navigation-right {
+        right: 0;
+    }
+
+    .checkbox:checked~.hamburguer-menu .menu {
+        transform: rotateZ(90deg);
+    }
+
+    .checkbox:checked~.hamburguer-menu .menu-line-1 {
+        transform: rotateZ(-40deg);
+    }
+
+    .checkbox:checked~.hamburguer-menu .menu-line-2 {
+        opacity: 0;
+    }
+
+    .checkbox:checked~.hamburguer-menu .menu-line-3 {
+        transform: rotateZ(40deg);
+    }
+}
+
+.header {
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(rgba($color-black, 0.7), rgba($color-black, 0.4)), url("../assets/bg.jpeg") center no-repeat;
+    background-size: cover;
+    position: relative;
+
+    .brand {
+        color: $color-white;
+        display: flex;
+        align-items: center;
+        @include centering(15%);
+
+        .main-name {
+            font-family: $font-nunito;
+            font-size: 50px;
+            color: $color-secondary;
+            @include textStyle;
+        }
+
+        .sub-name {
+            font-family: $font-josefinSans;
+            font-size: 18px;
+            color: $color-secondary;
+            text-align: center;
+            @include textStyle;
+        }
+    }
+
+    &-banner {
+        text-align: center;
+        @include centering(50%);
+    }
+
+    @media (max-width:1000px) {
+        height: 80vh;
+    }
+
+    @media (max-width:500px) {
+        height: 60vh;
+    }
+}
+
+.about-us {
+    height: 90vh;
+    display: flex;
+    align-items: center;
+    margin: 100px 0px;
+
+    @media (max-width:1000px) {
+        height: 60vh;
+    }
+
+    @media (max-width:500px) {
+        height: 40vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    &-left {
+        width: 40%;
+
+        @media (max-width:500px) {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        img {
+            width: 100%;
+            opacity: 0.7;
+
+            @media (max-width:500px) {
+                width: 50%;
+            }
+        }
+    }
+
+    &-right {
+        width: 60%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 100px;
+
+        @media (max-width:1000px) {
+            width: 100%;
+            padding: 0 40px;
+        }
+
+        @media (max-width:500px) {
+            width: 100%;
+        }
+
+        .stars {
+            margin: 30px 0;
+
+            @media (max-width:1000px) {
+                margin: 0 15px;
+            }
+
+            .star {
+                font-size: 15px;
+                color: $color-primary;
+                margin-left: 10px;
+            }
+        }
+
+        .description {
+            font-family: $font-josefinSans;
+            font-size: 20px;
+            font-style: italic;
+            color: $color-secondary;
+            text-align: justify;
+
+            &::first-letter {
+                padding-left: 50px;
+            }
+        }
+    }
+}
+
+.gallery {
+    .cards-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+
+
+    }
+}
+
+.footer {
+    padding: 70px 0;
+    @include flexLayout;
+    flex-direction: column;
+
+    &-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1px;
+        padding: 4rem;
+    }
+
+    .social-media {
+        display: flex;
+        width: 300px;
+        justify-content: space-around;
+        margin-bottom: 70px;
+        margin-top: -5rem;
+
+        &-item {
+            list-style: none;
+        }
+
+        &-link {
+            text-decoration: none;
+            font-size: 50px;
+            color: $color-primary;
+
+            &:hover {
+                color: $color-secondary;
+            }
+        }
+    }
+
+    &-copyright-paragraph {
+        font-family: $font-josefinSans;
+        font-size: 18px;
+        color: $color-secondary;
+        @include textStyle (capitalize);
+        padding: 2rem;
+        text-align: center;
+        margin-top: -7rem;
+    }
+}

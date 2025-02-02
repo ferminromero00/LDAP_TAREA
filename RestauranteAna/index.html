@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurante con SASS</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- NAV-BAR -->
+    <nav class="navbar">
+        <input type="checkbox" class="checkbox" id="check" hidden>
+        <div class="hamburguer-menu">
+            <label for="check" class="menu"></label>
+            <div class="menu-line menu-line-1"></div>
+            <div class="menu-line menu-line-2"></div>
+            <div class="menu-line menu-line-3"></div>
+        </div>
+
+        <div class="navbar-navigation">
+            <div class="navbar-navigation-left">
+                <img src="assets/nav-img-1.jpeg" alt="imagen 1" class="left-img left-img-1">
+                <img src="assets/nav-img-2.jpeg" alt="imagen 2" class="left-img left-img-2">
+                <img src="assets/nav-img-3.jpeg" alt="imagen 3" class="left-img left-img-3">
+            </div>
+
+            <div class="navbar-navigation-right">
+                <ul class="nav-list">
+                    <li class="nav-list-item"><a href="#" class="nav-list-link">Home</a></li>
+                    <li class="nav-list-item"><a href="#" class="nav-list-link">Acerca de</a></li>
+                    <li class="nav-list-item"><a href="#" class="nav-list-link">Galeria</a></li>
+                    <li class="nav-list-item"><a href="#" class="nav-list-link">Reservas</a></li>
+                    <li class="nav-list-item"><a href="#" class="nav-list-link">Servicios</a></li>
+                    <li class="nav-list-item"><a href="#" class="nav-list-link">Contacto</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <!--FIN NAV-BAR -->
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="brand">
+            <a href="#" class="logo"><i class="fa-solid fa-utensils"></i></a>
+            <div>
+                <h1 class="main-name">Ana</h1>
+                <p class="sub-name">Restaurante</p>
+            </div>
+        </div>
+        <div class="header-banner">
+            <h1 class="main-heading">Bienvenid@s</h1>
+            <h3 class="sub-heading">Sabemos lo que te gusta</h3>
+            <button class="main-btn">Reservaciones</button>
+        </div>
+    </header>
+    <!-- FIN DEL HEADER -->
+
+    <!-- PRINCIPIO DEL MAIN -->
+    <main>
+        <section class="about-us">
+            <div class="about-us-left">
+                <img src="assets/about-us-img.png" alt="imagen izquierda">
+            </div>
+            <div class="about-us-right">
+                <h1 class="main-heading">Acerca de</h1>
+                <h3 class="sub-heading">Introducion a Fermin Romero</h3>
+
+                <div class="stars">
+                    <i class="fa-solid fa-star star"></i>
+                    <i class="fa-solid fa-star star"></i>
+                    <i class="fa-solid fa-star star"></i>
+                </div>
+
+                <p class="description">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam sint quibusdam incidunt expedita
+                    exercitationem rem non a minus nisi porro debitis iusto, cum perspiciatis ipsam sed voluptatum
+                    cumque mollitia suscipit.
+                </p>
+
+                <div class="stars">
+                    <i class="fa-solid fa-star star"></i>
+                    <i class="fa-solid fa-star star"></i>
+                    <i class="fa-solid fa-star star"></i>
+                </div>
+
+                <button type="button" class="main-btn">Leer más</button>
+            </div>
+        </section>
+
+        <section class="gallery">
+            <div class="cards-wrapper">
+                <div class="card">
+                    <div class="card-overlay">
+                        <h1 class="card-overlay-header">Food Name</h1>
+                        <p class="card-overlay-paragraph">Precio: 10.00€</p>
+                        <button type="button" class="card-overlay-btn">Ordenar ahora</button>
+                    </div>
+                    <img src="assets/gallery-img-1.jpeg" alt="Imagen 1" class="card-img">
+                </div>
+                <div class="card">
+                    <div class="card-overlay">
+                        <h1 class="card-overlay-header">Food Name</h1>
+                        <p class="card-overlay-paragraph">Precio: 12.00€</p>
+                        <button type="button" class="card-overlay-btn">Ordenar ahora</button>
+                    </div>
+                    <img src="assets/gallery-img-2.jpeg" alt="Imagen 1" class="card-img">
+                </div>
+                <div class="card">
+                    <div class="card-overlay">
+                        <h1 class="card-overlay-header">Food Name</h1>
+                        <p class="card-overlay-paragraph">Precio: 15.00€</p>
+                        <button type="button" class="card-overlay-btn">Ordenar ahora</button>
+                    </div>
+                    <img src="assets/gallery-img-3.jpeg" alt="Imagen 1" class="card-img">
+                </div>
+                <div class="card">
+                    <div class="card-overlay">
+                        <h1 class="card-overlay-header">Food Name</h1>
+                        <p class="card-overlay-paragraph">Precio: 12.50€</p>
+                        <button type="button" class="card-overlay-btn">Ordenar ahora</button>
+                    </div>
+                    <img src="assets/gallery-img-4.jpeg" alt="Imagen 1" class="card-img">
+                </div>
+                <div class="card">
+                    <div class="card-overlay">
+                        <h1 class="card-overlay-header">Food Name</h1>
+                        <p class="card-overlay-paragraph">Precio: 12.10€</p>
+                        <button type="button" class="card-overlay-btn">Ordenar ahora</button>
+                    </div>
+                    <img src="assets/gallery-img-5.jpeg" alt="Imagen 1" class="card-img">
+                </div>
+                <div class="card">
+                    <div class="card-overlay">
+                        <h1 class="card-overlay-header">Food Name</h1>
+                        <p class="card-overlay-paragraph">Precio: 420.00€</p>
+                        <button type="button" class="card-overlay-btn">Ordenar ahora</button>
+                    </div>
+                    <img src="assets/gallery-img-6.jpeg" alt="Imagen 1" class="card-img">
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- FIN DEL MAIN -->
+
+    <!-- PRINCIPIO DEL FOOTER -->
+    <footer>
+        <div class="footer-header">
+            <a href="#" class="logo"><i class="fa-solid fa-utensils"></i></a>
+            <div>
+                <h1 class="main-name">Ana</h1>
+                <p class="sub-name">Restaurante</p>
+            </div>
+        </div>
+
+        <div class="footer social-media">
+            <ul class="social-media">
+                <li class="social-media-item">
+                    <a href="#" class="social-media-link"><i class="fa-brands fa-square-facebook"></i></a>
+                </li>
+                <li class="social-media-item">
+                    <a href="#" class="social-media-link"> <i class="fa-brands fa-square-instagram"></i></a>
+                </li>
+                <li class="social-media-item">
+                    <a href="#" class="social-media-link"> <i class="fa-brands fa-square-google-plus"></i></a>
+                </li>
+                <li class="social-media-item">
+                    <a href="#" class="social-media-link"> <i class="fa-brands fa-square-youtube"></i></a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="footer-copyright">
+            <p class="footer-copyright-paragraph">
+                &copy; Copyright. 2025. Restaurante
+            </p>
+        </div>
+
+    </footer>
+    <!-- FIN DEL FOOTER -->
+</body>
+
+</html>
