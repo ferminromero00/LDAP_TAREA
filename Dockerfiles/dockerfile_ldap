@@ -1,0 +1,14 @@
+FROM osixia/openldap:latest
+
+# Establece variables de entorno para la configuración de LDAP
+ENV LDAP_ORGANISATION="Ejemplo1" \
+    LDAP_DOMAIN="ldap-server.work.gd." \
+    LDAP_ADMIN_PASSWORD="admin"
+
+RUN apt-get update && \
+    apt-get install -y ldap-utils && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Exponer el puerto LDAP
+EXPOSE 389 636
