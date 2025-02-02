@@ -9,7 +9,6 @@ sudo mkdir /var/web
 cd /var
 sudo git clone https://github.com/ferminromero00/LDAP_TAREA.git
 sudo mv Despliegue-TiendaOnline/Dockerfiles/dockerfile_web web
-sudo rm -r Despliegue-TiendaOnline
 
 #Instalar docker
 sudo dnf install docker -y
