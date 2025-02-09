@@ -2,7 +2,7 @@ FROM osixia/openldap:latest
 
 # Establece variables de entorno para la configuración de LDAP
 ENV LDAP_ORGANISATION="Ejemplo1" \
-    LDAP_DOMAIN="ldap-server.work.gd." \
+    LDAP_DOMAIN="ldap-server.work.gd" \
     LDAP_ADMIN_PASSWORD="admin"
 
 RUN sed -i '/security.debian.org/d' /etc/apt/sources.list && \
