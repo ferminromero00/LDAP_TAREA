@@ -10,38 +10,35 @@ RUN sed -i '/security.debian.org/d' /etc/apt/sources.list
 RUN sed -i '/buster-backports/d' /etc/apt/sources.list
 RUN sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list
 RUN apt-get update
-RUN apt-get install -y ldap-utils apache2 apache2-utils libapache2-mod-ldap libapache2-mod-authnz-ldap
-RUN apt-get clean
-RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get install -y ldap-utils apache2 apache2-utils
 
 # Exponer los puertos de LDAP y Apache
 EXPOSE 389 636 80
 
 # Habilitar los módulos necesarios para la autenticación LDAP
+RUN apt-get install -y libapache2-mod-ldap libapache2-mod-authnz-ldap
 RUN a2enmod auth_basic authnz_ldap ldap
 
 # Configurar el Apache VirtualHost para proteger el directorio /protegido
-RUN cat <<EOF > /etc/apache2/sites-available/000-default.conf
-<VirtualHost *:80>
-    ServerName 10.0.1.161
-    DocumentRoot "/var/www/html"
-
-    <Directory "/var/www/html">
-        Require all granted
-    </Directory>
-
-    # Protegemos /protegido con autenticación LDAP
-    <Location /protegido>
-        AuthType Basic
-        AuthName "LDAP Authentication"
-        AuthBasicProvider ldap
-        AuthLDAPURL "ldap://10.0.1.161:389/ou=empleados,dc=ldap-server,dc=work,dc=gd?uid"
-        AuthLDAPBindDN "cn=admin,dc=ldap-server,dc=work,dc=gd"
-        AuthLDAPBindPassword "admin"
-        Require valid-user
-    </Location>
-</VirtualHost>
-EOF
+RUN echo -e "<VirtualHost *:80>\n\
+    ServerName 10.0.1.161\n\
+    DocumentRoot \"/var/www/html\"\n\
+\n\
+    <Directory \"/var/www/html\">\n\
+        Require all granted\n\
+    </Directory>\n\
+\n\
+    # Protegemos /protegido con autenticación LDAP\n\
+    <Location /protegido>\n\
+        AuthType Basic\n\
+        AuthName \"LDAP Authentication\"\n\
+        AuthBasicProvider ldap\n\
+        AuthLDAPURL \"ldap://10.0.1.161:389/ou=empleados,dc=ldap-server,dc=work,dc=gd?uid\"\n\
+        AuthLDAPBindDN \"cn=admin,dc=ldap-server,dc=work,dc=gd\"\n\
+        AuthLDAPBindPassword \"admin\"\n\
+        Require valid-user\n\
+    </Location>\n\
+</VirtualHost>" > /etc/apache2/sites-available/000-default.conf
 
 # Habilitar el sitio de Apache
 RUN a2ensite 000-default.conf
