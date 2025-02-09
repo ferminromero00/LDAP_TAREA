@@ -7,6 +7,9 @@ RUN yum update -y
 # Instalar Apache, Node.js, Git y otros paquetes necesarios
 RUN yum install -y httpd git mod_ssl curl
 
+# Instalar mod_ldap y mod_authnz_ldap
+RUN yum install -y mod_ldap mod_authnz_ldap
+
 # Eliminar archivos existentes en /var/www/html
 RUN rm -rf /var/www/html/*
 
@@ -22,6 +25,25 @@ RUN chown -R apache:apache /var/www/html && \
 
 # Eliminar archivo de configuración SSL predeterminado que causa el error
 RUN rm -f /etc/httpd/conf.d/ssl.conf
+
+# Añadir configuración de VirtualHost
+RUN echo '<VirtualHost *:80>\n\
+    ServerName 10.0.1.161\n\
+    DocumentRoot "/var/www/html"\n\
+    <Directory "/var/www/html">\n\
+        Require all granted\n\
+    </Directory>\n\
+    # Protegemos /admin con autenticación LDAP\n\
+    <Location /admin>\n\
+        AuthType Basic\n\
+        AuthName "Acceso Restringido"\n\
+        AuthBasicProvider ldap\n\
+        AuthLDAPURL "ldap://10.0.1.161:389/ou=empleados,dc=ldap-server,dc=work,dc=gd?uid"\n\
+        AuthLDAPBindDN "cn=admin,dc=ldap-server,dc=work,dc=gd"\n\
+        AuthLDAPBindPassword "admin"\n\
+        Require valid-user\n\
+    </Location>\n\
+</VirtualHost>' >> /etc/httpd/conf/httpd.conf
 
 # Exponer los puertos 80 y 443
 EXPOSE 80

@@ -13,5 +13,11 @@ RUN sed -i '/security.debian.org/d' /etc/apt/sources.list && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Copiar el fichero usuario1.ldif al contenedor
+COPY usuario1.ldif usuario1.ldif
+
+# Añadir el usuario a LDAP
+RUN ldapadd -x -D "cn=admin,dc=ldap-server,dc=work,dc=gd" -w admin -f usuario1.ldif
+
 # Exponer el puerto LDAP
 EXPOSE 389 636

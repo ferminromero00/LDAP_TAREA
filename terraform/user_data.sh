@@ -11,6 +11,7 @@ cd /var
 sudo git clone https://github.com/ferminromero00/LDAP_TAREA.git
 sudo mv LDAP_TAREA/Dockerfiles/dockerfile_web web
 sudo mv LDAP_TAREA/Dockerfiles/dockerfile_ldap ldap
+sudo mv LDAP_TAREA/Dockerfiles/usuario1.ldif ldap
 
 #Instalar docker
 sudo dnf install docker -y

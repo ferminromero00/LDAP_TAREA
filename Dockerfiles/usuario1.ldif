@@ -1,0 +1,7 @@
+dn: cn=usuario1,ou=empleados,dc=ldap-server,dc=work,dc=gd
+objectClass: inetOrgPerson
+objectClass: person
+cn: usuario1
+sn: Uno
+givenName: Usuario
+userPassword: ejemplo1
