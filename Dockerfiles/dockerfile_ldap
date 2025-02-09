@@ -40,12 +40,6 @@ RUN cat <<EOF > /etc/apache2/sites-available/000-default.conf
 </VirtualHost>
 EOF
 
-# Copiar el archivo LDIF para añadir usuarios al directorio LDAP
-COPY usuario1.ldif /usuario1.ldif
-
-# Añadir el usuario a LDAP
-RUN ldapadd -x -D "cn=admin,dc=ldap-server,dc=work,dc=gd" -w admin -f /usuario1.ldif
-
 # Habilitar el sitio de Apache
 RUN a2ensite 000-default.conf && \
     service apache2 reload

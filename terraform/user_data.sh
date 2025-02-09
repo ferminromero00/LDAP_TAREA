@@ -26,3 +26,6 @@ docker run -it --name restaurante -p 80:80 -p 443:443 -d restaurante
 cd /var/ldap
 docker build -f dockerfile_ldap -t ldap .
 docker run -it --name ldap -d -p 389:389 -p 636:636 ldap
+
+# Añadimos el usuario
+ldapadd -x -D "cn=admin,dc=ldap-server,dc=work,dc=gd" -w admin -f usuario1.ldif
