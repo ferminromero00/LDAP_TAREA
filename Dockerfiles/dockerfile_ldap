@@ -10,12 +10,15 @@ RUN sed -i '/security.debian.org/d' /etc/apt/sources.list && \
     sed -i '/buster-backports/d' /etc/apt/sources.list && \
     sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list && \
     apt-get update && \
-    apt-get install -y ldap-utils apache2 apache2-utils && \
+    apt-get install -y ldap-utils apache2 apache2-utils libapache2-mod-ldap-authz-ldap && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Exponer los puertos de LDAP y Apache
 EXPOSE 389 636 80
+
+# Habilitar los módulos necesarios para la autenticación LDAP
+RUN a2enmod auth_basic authnz_ldap ldap
 
 # Configurar el Apache VirtualHost para proteger el directorio /protegido
 RUN cat <<EOF > /etc/apache2/sites-available/000-default.conf
@@ -41,8 +44,8 @@ RUN cat <<EOF > /etc/apache2/sites-available/000-default.conf
 EOF
 
 # Habilitar el sitio de Apache
-RUN a2ensite 000-default.conf && \
-    service apache2 reload
+RUN a2ensite 000-default.conf 
+RUN service apache2 reload
 
 # Iniciar el servidor OpenLDAP y Apache
 CMD service apache2 start && /container/tool/run
