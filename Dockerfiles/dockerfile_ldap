@@ -22,10 +22,10 @@ RUN a2enmod auth_basic authnz_ldap ldap
 RUN echo -e \
 '<VirtualHost *:80>\n\
     ServerName 10.0.1.161\n\
-    DocumentRoot "/var/www/html"\n\n\
+    DocumentRoot "/var/www/html"\n\
     <Directory "/var/www/html">\n\
         Require all granted\n\
-    </Directory>\n\n\
+    </Directory>\n\
     # Protegemos /protegido con autenticación LDAP\n\
     <Location /protegido>\n\
         AuthType Basic\n\
