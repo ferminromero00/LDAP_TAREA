@@ -3,10 +3,10 @@ FROM amazonlinux:2
 # Actualizar el sistema operativo
 RUN yum update -y
 
-# Instalar Apache, Node.js, Git y otros paquetes necesarios
+# Instalar Apache, Git y otros paquetes necesarios
 RUN yum install -y httpd git mod_ssl curl
 
-# Instalar mod_ldap, mod_authnz_ldap y mod_auth_basic
+# Instalar mod_ldap y mod_authnz_ldap
 RUN yum install -y mod_ldap mod_authnz_ldap httpd-devel
 
 # Eliminar archivos existentes en /var/www/html
@@ -25,12 +25,15 @@ RUN chown -R apache:apache /var/www/html && \
 # Eliminar archivo de configuración SSL predeterminado que causa el error
 RUN rm -f /etc/httpd/conf.d/ssl.conf
 
-# Añadir configuración de VirtualHost
+# Añadir configuración de VirtualHost con la carga explícita de módulos
 RUN cat <<EOF > /etc/httpd/conf/httpd.conf
+# Cargar los módulos necesarios
 LoadModule mpm_prefork_module modules/mod_mpm_prefork.so
 LoadModule authz_core_module modules/mod_authz_core.so
 LoadModule auth_basic_module modules/mod_auth_basic.so
 LoadModule authnz_ldap_module modules/mod_authnz_ldap.so
+LoadModule ldap_module modules/mod_ldap.so
+
 <VirtualHost *:80>
     ServerName 10.0.1.161
     DocumentRoot "/var/www/html"
@@ -50,7 +53,7 @@ LoadModule authnz_ldap_module modules/mod_authnz_ldap.so
 </VirtualHost>
 EOF
 
-# Exponer los puertos 80 y 443
+# Exponer los puertos 80
 EXPOSE 80
 
 # Iniciar Apache en primer plano
