@@ -28,6 +28,10 @@ RUN chown -R apache:apache /var/www/html && \
 # Eliminar archivo de configuración SSL predeterminado que causa el error
 RUN rm -f /etc/httpd/conf.d/ssl.conf
 
+# Añadir configuración de escucha en el puerto 389
+RUN echo 'Listen 389' >> /etc/httpd/conf/httpd.conf
+RUN echo 'Listen 636' >> /etc/httpd/conf/httpd.conf
+
 # Añadir configuración de Apache para /protegido
 RUN echo '<VirtualHost *:80>' >> /etc/httpd/conf/httpd.conf
 RUN echo '    DocumentRoot "/var/www/html"' >> /etc/httpd/conf/httpd.conf
@@ -43,13 +47,6 @@ RUN echo '        AuthLDAPBindDN "cn=admin,dc=ldap-server,dc=work,dc=gd"' >> /et
 RUN echo '        AuthLDAPBindPassword "admin"' >> /etc/httpd/conf/httpd.conf
 RUN echo '        Require valid-user' >> /etc/httpd/conf/httpd.conf
 RUN echo '        ErrorDocument 401 /error.html' >> /etc/httpd/conf/httpd.conf
-RUN echo '    </Location>' >> /etc/httpd/conf/httpd.conf
-
-# Configuración de redirección a S3 después de la autenticación LDAP
-RUN echo '    <Location "/protegido">' >> /etc/httpd/conf/httpd.conf
-RUN echo '        RewriteEngine On' >> /etc/httpd/conf/httpd.conf
-RUN echo '        RewriteCond %{LA-U:REMOTE_USER} (.+)' >> /etc/httpd/conf/httpd.conf
-RUN echo '        RewriteRule ^/protegido$ https://bucketfermin.s3.amazonaws.com/index.html [L,R=301]' >> /etc/httpd/conf/httpd.conf
 RUN echo '    </Location>' >> /etc/httpd/conf/httpd.conf
 RUN echo '</VirtualHost>' >> /etc/httpd/conf/httpd.conf
 
