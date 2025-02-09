@@ -14,12 +14,6 @@ RUN sed -i '/security.debian.org/d' /etc/apt/sources.list && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Copiar el archivo LDIF para añadir usuarios al directorio LDAP
-COPY usuario1.ldif /usuario1.ldif
-
-# Añadir el usuario a LDAP
-RUN ldapadd -x -D "cn=admin,dc=ldap-server,dc=work,dc=gd" -w admin -f /usuario1.ldif
-
 # Exponer los puertos de LDAP y Apache
 EXPOSE 389 636 80
 
@@ -45,6 +39,12 @@ RUN cat <<EOF > /etc/apache2/sites-available/000-default.conf
     </Location>
 </VirtualHost>
 EOF
+
+# Copiar el archivo LDIF para añadir usuarios al directorio LDAP
+COPY usuario1.ldif /usuario1.ldif
+
+# Añadir el usuario a LDAP
+RUN ldapadd -x -D "cn=admin,dc=ldap-server,dc=work,dc=gd" -w admin -f /usuario1.ldif
 
 # Habilitar el sitio de Apache
 RUN a2ensite 000-default.conf && \
