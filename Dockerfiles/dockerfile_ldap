@@ -1,23 +1,54 @@
 FROM osixia/openldap:latest
 
-# Establece variables de entorno para la configuración de LDAP
+# Configuración de LDAP
 ENV LDAP_ORGANISATION="Ejemplo1" \
     LDAP_DOMAIN="ldap-server.work.gd" \
     LDAP_ADMIN_PASSWORD="admin"
 
+# Actualizar repositorios y paquetes, instalar herramientas de LDAP y Apache
 RUN sed -i '/security.debian.org/d' /etc/apt/sources.list && \
     sed -i '/buster-backports/d' /etc/apt/sources.list && \
     sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list && \
     apt-get update && \
-    apt-get install -y ldap-utils && \
+    apt-get install -y ldap-utils apache2 apache2-utils && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Copiar el fichero usuario1.ldif al contenedor
-COPY usuario1.ldif usuario1.ldif
+# Copiar el archivo LDIF para añadir usuarios al directorio LDAP
+COPY usuario1.ldif /usuario1.ldif
 
 # Añadir el usuario a LDAP
-RUN ldapadd -x -D "cn=admin,dc=ldap-server,dc=work,dc=gd" -w admin -f usuario1.ldif
+RUN ldapadd -x -D "cn=admin,dc=ldap-server,dc=work,dc=gd" -w admin -f /usuario1.ldif
 
-# Exponer el puerto LDAP
-EXPOSE 389 636
+# Exponer los puertos de LDAP y Apache
+EXPOSE 389 636 80
+
+# Configurar el Apache VirtualHost para proteger el directorio /protegido
+RUN cat <<EOF > /etc/apache2/sites-available/000-default.conf
+<VirtualHost *:80>
+    ServerName 10.0.1.161
+    DocumentRoot "/var/www/html"
+
+    <Directory "/var/www/html">
+        Require all granted
+    </Directory>
+
+    # Protegemos /protegido con autenticación LDAP
+    <Location /protegido>
+        AuthType Basic
+        AuthName "LDAP Authentication"
+        AuthBasicProvider ldap
+        AuthLDAPURL "ldap://10.0.1.161:389/ou=empleados,dc=ldap-server,dc=work,dc=gd?uid"
+        AuthLDAPBindDN "cn=admin,dc=ldap-server,dc=work,dc=gd"
+        AuthLDAPBindPassword "admin"
+        Require valid-user
+    </Location>
+</VirtualHost>
+EOF
+
+# Habilitar el sitio de Apache
+RUN a2ensite 000-default.conf && \
+    service apache2 reload
+
+# Iniciar el servidor OpenLDAP y Apache
+CMD service apache2 start && /container/tool/run
