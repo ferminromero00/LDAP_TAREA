@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')  // Aquí referenciamos el ID de las credenciales de AWS
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')  // La clave secreta de AWS
+        AWS_SESSION_TOKEN = credentials('AWS_SESSION_TOKEN')  // Si usas un token de sesión, también lo agregas
+        AWS_DEFAULT_REGION = 'us-east-1'  // Ajusta la región según tu configuración
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/ferminromero00/LDAP_TAREA'
+            }
+        }
+
+        stage('Instalar Terraform') {
+            steps {
+                script {
+                    // Descargar Terraform
+                    bat 'curl -Lo terraform.zip https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_windows_amd64.zip'
+                    
+                    // Descomprimir Terraform
+                    bat 'powershell -Command "Expand-Archive terraform.zip -DestinationPath terraform"'
+                    
+                    // Mover el binario terraform al directorio creado
+                    bat 'move terraform\\terraform.exe %USERPROFILE%\\terraform_bin\\'
+                }
+            }
+        }
+        
+        stage('Descargar Estado desde S3') {
+            steps {
+                script {
+                    // Descargar el archivo terraform.tfstate desde S3
+                    bat 'aws s3 cp s3://bucketfermin/terraform.tfstate terraform/terraform.tfstate'
+                }
+            }
+        }
+
+        stage('Inicializar Terraform') {
+            steps {
+                dir('terraform') {  
+                    // Inicializar Terraform
+                    bat '%USERPROFILE%\\terraform_bin\\terraform.exe init'
+                }
+            }
+        }
+
+        stage('Destruir Terraform') {
+            steps {
+                dir('terraform') {
+                    // Ejecutar terraform destroy para destruir los recursos
+                    bat '%USERPROFILE%\\terraform_bin\\terraform.exe destroy -auto-approve'
+                }
+            }
+        }
+    }
+}
