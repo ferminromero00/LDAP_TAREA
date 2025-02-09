@@ -4,4 +4,5 @@ objectClass: person
 cn: usuario1
 sn: Uno
 givenName: Usuario
+uid: usuario1
 userPassword: ejemplo1
