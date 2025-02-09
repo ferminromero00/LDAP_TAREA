@@ -16,7 +16,6 @@ RUN apt-get install -y ldap-utils apache2 apache2-utils
 EXPOSE 389 636 80
 
 # Habilitar los módulos necesarios para la autenticación LDAP
-RUN apt-get install -y libapache2-mod-ldap libapache2-mod-authnz-ldap
 RUN a2enmod auth_basic authnz_ldap ldap
 
 # Configurar el Apache VirtualHost para proteger el directorio /protegido
