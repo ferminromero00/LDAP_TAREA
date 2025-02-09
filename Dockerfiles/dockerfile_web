@@ -27,6 +27,8 @@ RUN rm -f /etc/httpd/conf.d/ssl.conf
 
 # Añadir configuración de VirtualHost con la carga explícita de módulos
 RUN echo 'LoadModule mpm_event_module modules/mod_mpm_event.so' > /etc/httpd/conf/httpd.conf
+RUN echo 'LoadModule auth_basic_module modules/mod_auth_basic.so' >> /etc/httpd/conf/httpd.conf
+RUN echo 'LoadModule authnz_ldap_module modules/mod_authnz_ldap.so' >> /etc/httpd/conf/httpd.conf
 
 RUN cat <<EOF >> /etc/httpd/conf/httpd.conf
 <Location "/protegido">
