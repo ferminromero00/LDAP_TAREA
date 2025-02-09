@@ -28,6 +28,7 @@ RUN rm -f /etc/httpd/conf.d/ssl.conf
 
 # Añadir configuración de VirtualHost
 RUN cat <<EOF > /etc/httpd/conf/httpd.conf
+LoadModule mpm_prefork_module modules/mod_mpm_prefork.so
 <VirtualHost *:80>
     ServerName 10.0.1.161
     DocumentRoot "/var/www/html"
