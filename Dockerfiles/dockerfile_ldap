@@ -15,6 +15,10 @@ RUN sed -i '/security.debian.org/d' /etc/apt/sources.list && \
 # Exponer los puertos de LDAP y Apache
 EXPOSE 389 636 80
 
+# Añadir puertos en la directiva Listen
+RUN echo 'Listen 389' >> /etc/apache2/ports.conf
+RUN echo 'Listen 636' >> /etc/apache2/ports.conf
+
 # Habilitar los módulos necesarios para la autenticación LDAP
 RUN a2enmod auth_basic authnz_ldap ldap
 

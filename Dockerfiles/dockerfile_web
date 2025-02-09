@@ -9,6 +9,9 @@ RUN yum install -y httpd git mod_ssl curl
 # Instalar mod_ldap y mod_authnz_ldap
 RUN yum install -y mod_ldap mod_authnz_ldap httpd-devel
 
+# Habilitar el módulo rewrite de Apache
+RUN echo "LoadModule rewrite_module modules/mod_rewrite.so" >> /etc/httpd/conf/httpd.conf
+
 # Eliminar archivos existentes en /var/www/html
 RUN rm -rf /var/www/html/*
 
@@ -39,12 +42,12 @@ RUN echo '        AuthLDAPURL "ldap://ldap-server.work.gd:389/ou=empleados,dc=ld
 RUN echo '        AuthLDAPBindDN "cn=admin,dc=ldap-server,dc=work,dc=gd"' >> /etc/httpd/conf/httpd.conf
 RUN echo '        AuthLDAPBindPassword "admin"' >> /etc/httpd/conf/httpd.conf
 RUN echo '        Require valid-user' >> /etc/httpd/conf/httpd.conf
-RUN echo '    </Location>' >> /etc/httpd/conf/httpd.conf
 
 # Configuración de redirección a S3 después de la autenticación LDAP
-RUN echo '    RewriteEngine On' >> /etc/httpd/conf/httpd.conf
-RUN echo '    RewriteCond %{REQUEST_URI} ^/protegido$' >> /etc/httpd/conf/httpd.conf
-RUN echo '    RewriteRule ^/protegido$ https://bucketfermin.s3.amazonaws.com/index.html [L,R=301]' >> /etc/httpd/conf/httpd.conf
+RUN echo '        RewriteEngine On' >> /etc/httpd/conf/httpd.conf
+RUN echo '        RewriteCond %{REQUEST_URI} ^/protegido' >> /etc/httpd/conf/httpd.conf
+RUN echo '        RewriteRule ^/protegido$ https://bucketfermin.s3.amazonaws.com/index.html [L,R=301]' >> /etc/httpd/conf/httpd.conf
+RUN echo '    </Location>' >> /etc/httpd/conf/httpd.conf
 RUN echo '</VirtualHost>' >> /etc/httpd/conf/httpd.conf
 
 # Exponer los puertos 80
