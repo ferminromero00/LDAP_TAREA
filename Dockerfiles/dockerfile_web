@@ -9,8 +9,8 @@ RUN yum install -y httpd git mod_ssl curl
 # Instalar mod_ldap y mod_authnz_ldap
 RUN yum install -y mod_ldap mod_authnz_ldap httpd-devel
 
-# Cargar el MPM de Apache
-RUN echo "LoadModule mpm_prefork_module modules/mod_mpm_prefork.so" >> /etc/httpd/conf/httpd.conf
+# Instalar mpm-prefork explícitamente
+RUN yum install -y httpd-mpm-prefork
 
 # Eliminar archivos existentes en /var/www/html
 RUN rm -rf /var/www/html/*
@@ -29,7 +29,9 @@ RUN chown -R apache:apache /var/www/html && \
 RUN rm -f /etc/httpd/conf.d/ssl.conf
 
 # Añadir configuración de VirtualHost con la carga explícita de módulos
-RUN cat <<EOF > /etc/httpd/conf/httpd.conf
+RUN echo 'LoadModule mpm_prefork_module modules/mod_mpm_prefork.so' > /etc/httpd/conf/httpd.conf
+
+RUN cat <<EOF >> /etc/httpd/conf/httpd.conf
 <Location "/protegido">
     AuthType Basic
     AuthName "LDAP Authentication"
