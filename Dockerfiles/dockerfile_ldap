@@ -41,8 +41,5 @@ RUN echo -e \
 # Habilitar el sitio de Apache
 RUN a2ensite 000-default.conf
 
-# Recargar Apache para aplicar la configuración
-RUN service apache2 reload
-
 # Iniciar el servidor OpenLDAP y Apache
 CMD service apache2 start && /container/tool/run
