@@ -5,6 +5,9 @@ ENV LDAP_ORGANISATION="Ejemplo1" \
     LDAP_DOMAIN="ldap-server.work.gd" \
     LDAP_ADMIN_PASSWORD="admin"
 
+RUN apt-get update 
+RUN apt-get install -y ldap-utils
+
 # Exponer los puertos de LDAP
 EXPOSE 389 636
 
