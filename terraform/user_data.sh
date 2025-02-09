@@ -12,8 +12,9 @@ sudo git clone https://github.com/ferminromero00/LDAP_TAREA.git
 sudo mv LDAP_TAREA/Dockerfiles/dockerfile_web web
 sudo mv LDAP_TAREA/Dockerfiles/dockerfile_ldap ldap
 sudo mv LDAP_TAREA/Dockerfiles/usuario1.ldif ldap
+sudo mv LDAP_TAREA/Dockerfiles/ou_empleados.ldif ldap
 
-#Instalar docker
+# Instalar docker
 sudo dnf install docker -y
 sudo systemctl start docker
 
@@ -27,8 +28,8 @@ cd /var/ldap
 docker build -f dockerfile_ldap -t ldap .
 docker run -it --name ldap -d -p 389:389 -p 636:636 ldap
 
-# Añadimos el usuario
+# Añadimos la unidad organizativa y el usuario
+docker cp ou_empleados.ldif ldap:/root/ou_empleados.ldif
 docker cp usuario1.ldif ldap:/root/usuario1.ldif
-docker cp usuario1.ldif ldap:/root/ou_empleados.ldif
 docker exec -it ldap /bin/bash -c "ldapadd -x -D 'cn=admin,dc=ldap-server,dc=work,dc=gd' -w admin -f /root/ou_empleados.ldif"
 docker exec -it ldap /bin/bash -c "ldapadd -x -D 'cn=admin,dc=ldap-server,dc=work,dc=gd' -w admin -f /root/usuario1.ldif"
