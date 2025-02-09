@@ -28,4 +28,7 @@ docker build -f dockerfile_ldap -t ldap .
 docker run -it --name ldap -d -p 389:389 -p 636:636 ldap
 
 # Añadimos el usuario
-ldapadd -x -D "cn=admin,dc=ldap-server,dc=work,dc=gd" -w admin -f usuario1.ldif
+docker cp usuario1.ldif ldap:/root/usuario1.ldif
+docker cp usuario1.ldif ldap:/root/ou_empleados.ldif
+docker exec -it ldap /bin/bash -c "ldapadd -x -D 'cn=admin,dc=ldap-server,dc=work,dc=gd' -w admin -f /root/ou_empleados.ldif"
+docker exec -it ldap /bin/bash -c "ldapadd -x -D 'cn=admin,dc=ldap-server,dc=work,dc=gd' -w admin -f /root/usuario1.ldif"
