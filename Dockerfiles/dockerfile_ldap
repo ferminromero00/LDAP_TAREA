@@ -6,13 +6,13 @@ ENV LDAP_ORGANISATION="Ejemplo1" \
     LDAP_ADMIN_PASSWORD="admin"
 
 # Actualizar repositorios y paquetes, instalar herramientas de LDAP y Apache
-RUN sed -i '/security.debian.org/d' /etc/apt/sources.list && \
-    sed -i '/buster-backports/d' /etc/apt/sources.list && \
-    sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get install -y ldap-utils apache2 apache2-utils libapache2-mod-ldap-authz-ldap && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN sed -i '/security.debian.org/d' /etc/apt/sources.list
+RUN sed -i '/buster-backports/d' /etc/apt/sources.list
+RUN sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list
+RUN apt-get update
+RUN apt-get install -y ldap-utils apache2 apache2-utils libapache2-mod-ldap libapache2-mod-authnz-ldap
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
 
 # Exponer los puertos de LDAP y Apache
 EXPOSE 389 636 80
@@ -44,7 +44,9 @@ RUN cat <<EOF > /etc/apache2/sites-available/000-default.conf
 EOF
 
 # Habilitar el sitio de Apache
-RUN a2ensite 000-default.conf 
+RUN a2ensite 000-default.conf
+
+# Recargar Apache para aplicar la configuración
 RUN service apache2 reload
 
 # Iniciar el servidor OpenLDAP y Apache
