@@ -25,14 +25,6 @@ RUN chown -R apache:apache /var/www/html && \
 # Eliminar archivo de configuración SSL predeterminado que causa el error
 RUN rm -f /etc/httpd/conf.d/ssl.conf
 
-# Eliminar cualquier carga de otros módulos MPM (por ejemplo, mpm_prefork o mpm_worker) si existen
-RUN sed -i '/^LoadModule.*mpm_/d' /etc/httpd/conf/httpd.conf
-
-# Añadir configuración de VirtualHost con la carga explícita del módulo mpm_event
-RUN echo 'LoadModule mpm_event_module modules/mod_mpm_event.so' >> /etc/httpd/conf/httpd.conf
-RUN echo 'LoadModule auth_basic_module modules/mod_auth_basic.so' >> /etc/httpd/conf/httpd.conf
-RUN echo 'LoadModule authnz_ldap_module modules/mod_authnz_ldap.so' >> /etc/httpd/conf/httpd.conf
-
 # Añadir configuración de Apache para /protegido
 RUN echo '<VirtualHost *:80>' >> /etc/httpd/conf/httpd.conf
 RUN echo '    DocumentRoot "/var/www/html"' >> /etc/httpd/conf/httpd.conf
