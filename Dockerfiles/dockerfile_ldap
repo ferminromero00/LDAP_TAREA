@@ -5,50 +5,8 @@ ENV LDAP_ORGANISATION="Ejemplo1" \
     LDAP_DOMAIN="ldap-server.work.gd" \
     LDAP_ADMIN_PASSWORD="admin"
 
-# Actualizar repositorios y paquetes, instalar herramientas de LDAP y Apache
-RUN sed -i '/security.debian.org/d' /etc/apt/sources.list && \
-    sed -i '/buster-backports/d' /etc/apt/sources.list && \
-    sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get install -y ldap-utils apache2 apache2-utils
+# Exponer los puertos de LDAP
+EXPOSE 389 636
 
-# Exponer los puertos de LDAP y Apache
-EXPOSE 389 636 80
-
-# Añadir puertos en la directiva Listen
-RUN echo 'Listen 389' >> /etc/apache2/ports.conf
-RUN echo 'Listen 636' >> /etc/apache2/ports.conf
-
-# Habilitar los módulos necesarios para la autenticación LDAP
-RUN a2enmod auth_basic authnz_ldap ldap
-
-# Configurar el Apache VirtualHost para proteger el directorio /protegido
-RUN echo '<VirtualHost *:80>' >> /etc/httpd/conf/httpd.conf
-RUN echo '    DocumentRoot "/var/www/html"' >> /etc/httpd/conf/httpd.conf
-RUN echo '    <Directory "/var/www/html">' >> /etc/httpd/conf/httpd.conf
-RUN echo '        Require all granted' >> /etc/httpd/conf/httpd.conf
-RUN echo '    </Directory>' >> /etc/httpd/conf/httpd.conf
-RUN echo '    <Location "/protegido">' >> /etc/httpd/conf/httpd.conf
-RUN echo '        AuthType Basic' >> /etc/httpd/conf/httpd.conf
-RUN echo '        AuthName "LDAP Authentication"' >> /etc/httpd/conf/httpd.conf
-RUN echo '        AuthBasicProvider ldap' >> /etc/httpd/conf/httpd.conf
-RUN echo '        AuthLDAPURL "ldap://ldap-server.work.gd:389/ou=empleados,dc=ldap-server,dc=work,dc=gd?uid"' >> /etc/httpd/conf/httpd.conf
-RUN echo '        AuthLDAPBindDN "cn=admin,dc=ldap-server,dc=work,dc=gd"' >> /etc/httpd/conf/httpd.conf
-RUN echo '        AuthLDAPBindPassword "admin"' >> /etc/httpd/conf/httpd.conf
-RUN echo '        Require valid-user' >> /etc/httpd/conf/httpd.conf
-RUN echo '        ErrorDocument 401 /error.html' >> /etc/httpd/conf/httpd.conf
-RUN echo '    </Location>' >> /etc/httpd/conf/httpd.conf
-
-# Configuración de redirección a S3 después de la autenticación LDAP
-RUN echo '    <Location "/protegido">' >> /etc/httpd/conf/httpd.conf
-RUN echo '        RewriteEngine On' >> /etc/httpd/conf/httpd.conf
-RUN echo '        RewriteCond %{LA-U:REMOTE_USER} (.+)' >> /etc/httpd/conf/httpd.conf
-RUN echo '        RewriteRule ^/protegido$ https://bucketfermin.s3.amazonaws.com/index.html [L,R=301]' >> /etc/httpd/conf/httpd.conf
-RUN echo '    </Location>' >> /etc/httpd/conf/httpd.conf
-RUN echo '</VirtualHost>' >> /etc/httpd/conf/httpd.conf
-
-# Habilitar el sitio de Apache
-RUN a2ensite 000-default.conf
-
-# Iniciar el servidor OpenLDAP y Apache
-CMD service apache2 start && /container/tool/run
+# Iniciar el servidor OpenLDAP
+CMD /container/tool/run

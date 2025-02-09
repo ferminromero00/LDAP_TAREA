@@ -42,10 +42,13 @@ RUN echo '        AuthLDAPURL "ldap://ldap-server.work.gd:389/ou=empleados,dc=ld
 RUN echo '        AuthLDAPBindDN "cn=admin,dc=ldap-server,dc=work,dc=gd"' >> /etc/httpd/conf/httpd.conf
 RUN echo '        AuthLDAPBindPassword "admin"' >> /etc/httpd/conf/httpd.conf
 RUN echo '        Require valid-user' >> /etc/httpd/conf/httpd.conf
+RUN echo '        ErrorDocument 401 /error.html' >> /etc/httpd/conf/httpd.conf
+RUN echo '    </Location>' >> /etc/httpd/conf/httpd.conf
 
 # Configuración de redirección a S3 después de la autenticación LDAP
+RUN echo '    <Location "/protegido">' >> /etc/httpd/conf/httpd.conf
 RUN echo '        RewriteEngine On' >> /etc/httpd/conf/httpd.conf
-RUN echo '        RewriteCond %{REQUEST_URI} ^/protegido' >> /etc/httpd/conf/httpd.conf
+RUN echo '        RewriteCond %{LA-U:REMOTE_USER} (.+)' >> /etc/httpd/conf/httpd.conf
 RUN echo '        RewriteRule ^/protegido$ https://bucketfermin.s3.amazonaws.com/index.html [L,R=301]' >> /etc/httpd/conf/httpd.conf
 RUN echo '    </Location>' >> /etc/httpd/conf/httpd.conf
 RUN echo '</VirtualHost>' >> /etc/httpd/conf/httpd.conf
