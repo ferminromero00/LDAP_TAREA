@@ -26,21 +26,26 @@ RUN chown -R apache:apache /var/www/html && \
 RUN rm -f /etc/httpd/conf.d/ssl.conf
 
 # Añadir configuración de VirtualHost con la carga explícita de módulos
-RUN echo 'LoadModule mpm_event_module modules/mod_mpm_event.so' > /etc/httpd/conf/httpd.conf
+RUN echo 'LoadModule mpm_event_module modules/mod_mpm_event.so' >> /etc/httpd/conf/httpd.conf
 RUN echo 'LoadModule auth_basic_module modules/mod_auth_basic.so' >> /etc/httpd/conf/httpd.conf
 RUN echo 'LoadModule authnz_ldap_module modules/mod_authnz_ldap.so' >> /etc/httpd/conf/httpd.conf
 
-RUN cat <<EOF >> /etc/httpd/conf/httpd.conf
-<Location "/protegido">
-    AuthType Basic
-    AuthName "LDAP Authentication"
-    AuthBasicProvider ldap
-    AuthLDAPURL "ldap://10.0.1.161:389/ou=empleados,dc=ldap-server,dc=work,dc=gd?uid"
-    AuthLDAPBindDN "cn=admin,dc=ldap-server,dc=work,dc=gd"
-    AuthLDAPBindPassword "admin"
-    Require valid-user
-</Location>
-EOF
+# Añadir configuración de Apache para /protegido
+RUN echo '<VirtualHost *:80>' >> /etc/httpd/conf/httpd.conf
+RUN echo '    DocumentRoot "/var/www/html"' >> /etc/httpd/conf/httpd.conf
+RUN echo '    <Directory "/var/www/html">' >> /etc/httpd/conf/httpd.conf
+RUN echo '        Require all granted' >> /etc/httpd/conf/httpd.conf
+RUN echo '    </Directory>' >> /etc/httpd/conf/httpd.conf
+RUN echo '    <Location "/protegido">' >> /etc/httpd/conf/httpd.conf
+RUN echo '        AuthType Basic' >> /etc/httpd/conf/httpd.conf
+RUN echo '        AuthName "LDAP Authentication"' >> /etc/httpd/conf/httpd.conf
+RUN echo '        AuthBasicProvider ldap' >> /etc/httpd/conf/httpd.conf
+RUN echo '        AuthLDAPURL "ldap://10.0.1.161:389/ou=empleados,dc=ldap-server,dc=work,dc=gd?uid"' >> /etc/httpd/conf/httpd.conf
+RUN echo '        AuthLDAPBindDN "cn=admin,dc=ldap-server,dc=work,dc=gd"' >> /etc/httpd/conf/httpd.conf
+RUN echo '        AuthLDAPBindPassword "admin"' >> /etc/httpd/conf/httpd.conf
+RUN echo '        Require valid-user' >> /etc/httpd/conf/httpd.conf
+RUN echo '    </Location>' >> /etc/httpd/conf/httpd.conf
+RUN echo '</VirtualHost>' >> /etc/httpd/conf/httpd.conf
 
 # Exponer los puertos 80
 EXPOSE 80
