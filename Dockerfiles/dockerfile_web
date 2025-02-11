@@ -31,6 +31,7 @@ RUN chown -R apache:apache /var/www/html/protegido && \
 # Añadir configuración de escucha en el puerto 389
 RUN echo 'Listen 389' >> /etc/httpd/conf/httpd.conf
 RUN echo 'Listen 636' >> /etc/httpd/conf/httpd.conf
+RUN echo 'Listen 443' >> /etc/httpd/conf/httpd.conf
 
 # Añadir configuración de Apache para /protegido
 RUN echo '<VirtualHost *:80>' >> /etc/httpd/conf/httpd.conf
@@ -87,22 +88,22 @@ RUN cat <<EOF > /etc/httpd/conf.d/ssl-vhost.conf
 EOF
 
 # Redirigir HTTP a HTTPS en el puerto 80
-RUN cat <<EOF > /etc/httpd/conf.d/redirect-http-to-https.conf
-<VirtualHost *:80>
-    DocumentRoot "/var/www/html"
-    ServerName ldap-server.work.gd
+# RUN cat <<EOF > /etc/httpd/conf.d/redirect-http-to-https.conf
+# <VirtualHost *:80>
+#     DocumentRoot "/var/www/html"
+#     ServerName ldap-server.work.gd
 
-    <Directory "/var/www/html">
-        AllowOverride All
-        Require all granted
-    </Directory>
+#     <Directory "/var/www/html">
+#         AllowOverride All
+#         Require all granted
+#     </Directory>
 
-    Redirect permanent / https://ldap-server.work.gd/
+#     Redirect permanent / https://ldap-server.work.gd/
 
-    ErrorLog /var/log/httpd/http_error.log
-    CustomLog /var/log/httpd/http_access.log combined
-</VirtualHost>
-EOF
+#     ErrorLog /var/log/httpd/http_error.log
+#     CustomLog /var/log/httpd/http_access.log combined
+# </VirtualHost>
+# EOF
 
 # Exponer los puertos 80
 EXPOSE 80
