@@ -18,7 +18,7 @@ sudo mv LDAP_TAREA/Certificates/certificate.crt web
 sudo mv LDAP_TAREA/Certificates/private.key web
 
 #Actualizar IP del DNS-EXIT
-# curl https://api.dnsexit.com/dns/ud/?apikey=z8Ra6giAcLhaO19L3Vy4L3729rKqY7 -d host=ldap-server.work.gd
+curl https://api.dnsexit.com/dns/ud/?apikey=z8Ra6giAcLhaO19L3Vy4L3729rKqY7 -d host=ldap-server.work.gd
 
 # Instalar docker
 sudo dnf install docker -y
