@@ -43,7 +43,7 @@ RUN echo '    <Location "/protegido">' >> /etc/httpd/conf/httpd.conf
 RUN echo '        AuthType Basic' >> /etc/httpd/conf/httpd.conf
 RUN echo '        AuthName "LDAP Authentication"' >> /etc/httpd/conf/httpd.conf
 RUN echo '        AuthBasicProvider ldap' >> /etc/httpd/conf/httpd.conf
-RUN echo '        AuthLDAPURL "ldap://ldap-server.work.gd:389/ou=empleados,dc=ldap-server,dc=work,dc=gd?uid"' >> /etc/httpd/conf/httpd.conf
+RUN echo '        AuthLDAPURL "ldaps://ldap-server.work.gd:636/ou=empleados,dc=ldap-server,dc=work,dc=gd?uid"' >> /etc/httpd/conf/httpd.conf
 RUN echo '        AuthLDAPBindDN "cn=admin,dc=ldap-server,dc=work,dc=gd"' >> /etc/httpd/conf/httpd.conf
 RUN echo '        AuthLDAPBindPassword "admin"' >> /etc/httpd/conf/httpd.conf
 RUN echo '        Require valid-user' >> /etc/httpd/conf/httpd.conf
@@ -84,6 +84,10 @@ RUN cat <<EOF > /etc/httpd/conf.d/ssl-vhost.conf
 </VirtualHost>
 EOF
 
+# Añadir configuración LDAP para confiar en el servidor LDAP usando SSL
+RUN echo 'LDAPTrustedMode SSL' >> /etc/httpd/conf/httpd.conf
+RUN echo 'LDAPTrustedGlobalCert CA_BASE64 /etc/pki/tls/certs/ca_bundle.crt' >> /etc/httpd/conf/httpd.conf
+
 # Redirigir HTTP a HTTPS en el puerto 80
 # RUN cat <<EOF > /etc/httpd/conf.d/redirect-http-to-https.conf
 # <VirtualHost *:80>
@@ -103,7 +107,7 @@ EOF
 # EOF
 
 # Exponer los puertos 80
-EXPOSE 80
+EXPOSE 80 443 389 636
 
 # Iniciar Apache en primer plano
 CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
