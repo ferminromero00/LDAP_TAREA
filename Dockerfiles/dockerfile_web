@@ -70,7 +70,7 @@ RUN cat <<EOF > /etc/httpd/conf.d/ssl-vhost.conf
     SSLCertificateKeyFile /etc/pki/tls/private/private.key
     SSLCertificateChainFile /etc/pki/tls/certs/ca_bundle.crt
 
-    SSLProtocol -all +TLSv1.2 +TLSv1.3 
+    SSLProtocol all -SSLv3 -TLSv1 -TLSv1.1
     SSLCipherSuite HIGH:!aNULL:!MD5
     SSLHonorCipherOrder on
 
