@@ -25,11 +25,8 @@ RUN mkdir /var/www/html/protegido
 RUN cp -r /var/www/html/LDAP_TAREA/RestauranteAna/* /var/www/html/protegido/
 
 # Configurar permisos para la web
-RUN chown -R apache:apache /var/www/html && \
-    chmod -R 755 /var/www/html
-
-# Eliminar archivo de configuración SSL predeterminado que causa el error
-RUN rm -f /etc/httpd/conf.d/ssl.conf
+RUN chown -R apache:apache /var/www/html/protegido && \
+    chmod -R 755 /var/www/html/protegido
 
 # Añadir configuración de escucha en el puerto 389
 RUN echo 'Listen 389' >> /etc/httpd/conf/httpd.conf
@@ -41,6 +38,9 @@ RUN echo '    DocumentRoot "/var/www/html"' >> /etc/httpd/conf/httpd.conf
 RUN echo '    <Directory "/var/www/html">' >> /etc/httpd/conf/httpd.conf
 RUN echo '        Require all granted' >> /etc/httpd/conf/httpd.conf
 RUN echo '    </Directory>' >> /etc/httpd/conf/httpd.conf
+RUN echo '    <Location "/">' >> /etc/httpd/conf/httpd.conf
+RUN echo '        Redirect permanent / /protegido/' >> /etc/httpd/conf/httpd.conf
+RUN echo '    </Location>' >> /etc/httpd/conf/httpd.conf
 RUN echo '    <Location "/protegido">' >> /etc/httpd/conf/httpd.conf
 RUN echo '        AuthType Basic' >> /etc/httpd/conf/httpd.conf
 RUN echo '        AuthName "LDAP Authentication"' >> /etc/httpd/conf/httpd.conf
@@ -52,6 +52,57 @@ RUN echo '        Require valid-user' >> /etc/httpd/conf/httpd.conf
 RUN echo '        ErrorDocument 401 /error.html' >> /etc/httpd/conf/httpd.conf
 RUN echo '    </Location>' >> /etc/httpd/conf/httpd.conf
 RUN echo '</VirtualHost>' >> /etc/httpd/conf/httpd.conf
+
+# Copiar certificados SSL
+COPY certificate.crt /etc/pki/tls/certs/
+COPY private.key /etc/pki/tls/private/
+COPY ca_bundle.crt /etc/pki/tls/certs/
+
+# Eliminar archivo de configuración SSL predeterminado que causa el error
+RUN rm -f /etc/httpd/conf.d/ssl.conf
+
+# Crear archivo de configuración SSL para Apache
+RUN cat <<EOF > /etc/httpd/conf.d/ssl-vhost.conf
+<VirtualHost *:443>
+    DocumentRoot "/var/www/html"
+    ServerName ldap-server.work.gd
+
+    SSLEngine on
+    SSLCertificateFile /etc/pki/tls/certs/certificate.crt
+    SSLCertificateKeyFile /etc/pki/tls/private/private.key
+    SSLCertificateChainFile /etc/pki/tls/certs/ca_bundle.crt
+
+    SSLProtocol all -SSLv3 -TLSv1 -TLSv1.1
+    SSLCipherSuite HIGH:!aNULL:!MD5
+    SSLHonorCipherOrder on
+
+    <Directory "/var/www/html">
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog /var/log/httpd/ssl_error.log
+    CustomLog /var/log/httpd/ssl_access.log combined
+</VirtualHost>
+EOF
+
+# Redirigir HTTP a HTTPS en el puerto 80
+RUN cat <<EOF > /etc/httpd/conf.d/redirect-http-to-https.conf
+<VirtualHost *:80>
+    DocumentRoot "/var/www/html"
+    ServerName ldap-server.work.gd
+
+    <Directory "/var/www/html">
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    Redirect permanent / https://ldap-server.work.gd/
+
+    ErrorLog /var/log/httpd/http_error.log
+    CustomLog /var/log/httpd/http_access.log combined
+</VirtualHost>
+EOF
 
 # Exponer los puertos 80
 EXPOSE 80

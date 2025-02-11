@@ -13,6 +13,9 @@ sudo mv LDAP_TAREA/Dockerfiles/dockerfile_web web
 sudo mv LDAP_TAREA/Dockerfiles/dockerfile_ldap ldap
 sudo mv LDAP_TAREA/Dockerfiles/usuario1.ldif ldap
 sudo mv LDAP_TAREA/Dockerfiles/ou_empleados.ldif ldap
+sudo mv LDAP_TAREA/Certificates/ca_bundle.crt web
+sudo mv LDAP_TAREA/Certificates/certificate.crt web
+sudo mv LDAP_TAREA/Certificates/private.key web
 
 #Actualizar IP del DNS-EXIT
 # curl https://api.dnsexit.com/dns/ud/?apikey=z8Ra6giAcLhaO19L3Vy4L3729rKqY7 -d host=ldap-server.work.gd
