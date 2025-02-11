@@ -35,7 +35,7 @@ docker run -it --name ldap -d -p 389:389 -p 636:636 ldap
 docker cp ou_empleados.ldif ldap:/root/ou_empleados.ldif
 docker cp usuario1.ldif ldap:/root/usuario1.ldif
 
-# Esperar 10 segundos antes de ejecutar los comandos ldapadd
+# Esperar 60 segundos antes de ejecutar los comandos ldapadd
 sleep 60
 
 docker exec -it ldap /bin/bash -c "ldapadd -x -D 'cn=admin,dc=ldap-server,dc=work,dc=gd' -w admin -f /root/ou_empleados.ldif"
