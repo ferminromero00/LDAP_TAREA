@@ -33,24 +33,6 @@ RUN echo 'Listen 389' >> /etc/httpd/conf/httpd.conf
 RUN echo 'Listen 636' >> /etc/httpd/conf/httpd.conf
 RUN echo 'Listen 443' >> /etc/httpd/conf/httpd.conf
 
-# Añadir configuración de Apache para /protegido
-RUN echo '<VirtualHost *:80>' >> /etc/httpd/conf/httpd.conf
-RUN echo '    DocumentRoot "/var/www/html"' >> /etc/httpd/conf/httpd.conf
-RUN echo '    <Directory "/var/www/html">' >> /etc/httpd/conf/httpd.conf
-RUN echo '        Require all granted' >> /etc/httpd/conf/httpd.conf
-RUN echo '    </Directory>' >> /etc/httpd/conf/httpd.conf
-RUN echo '    <Location "/protegido">' >> /etc/httpd/conf/httpd.conf
-RUN echo '        AuthType Basic' >> /etc/httpd/conf/httpd.conf
-RUN echo '        AuthName "LDAP Authentication"' >> /etc/httpd/conf/httpd.conf
-RUN echo '        AuthBasicProvider ldap' >> /etc/httpd/conf/httpd.conf
-RUN echo '        AuthLDAPURL "ldap://ldap-server.work.gd:389/ou=empleados,dc=ldap-server,dc=work,dc=gd?uid"' >> /etc/httpd/conf/httpd.conf
-RUN echo '        AuthLDAPBindDN "cn=admin,dc=ldap-server,dc=work,dc=gd"' >> /etc/httpd/conf/httpd.conf
-RUN echo '        AuthLDAPBindPassword "admin"' >> /etc/httpd/conf/httpd.conf
-RUN echo '        Require valid-user' >> /etc/httpd/conf/httpd.conf
-RUN echo '        ErrorDocument 401 /error.html' >> /etc/httpd/conf/httpd.conf
-RUN echo '    </Location>' >> /etc/httpd/conf/httpd.conf
-RUN echo '</VirtualHost>' >> /etc/httpd/conf/httpd.conf
-
 # Copiar certificados SSL
 COPY certificate.crt /etc/pki/tls/certs/
 COPY private.key /etc/pki/tls/private/
@@ -97,22 +79,22 @@ RUN cat <<EOF > /etc/httpd/conf.d/ssl-vhost.conf
 EOF
 
 # Redirigir HTTP a HTTPS en el puerto 80
-# RUN cat <<EOF > /etc/httpd/conf.d/redirect-http-to-https.conf
-# <VirtualHost *:80>
-#     DocumentRoot "/var/www/html"
-#     ServerName ldap-server.work.gd
+RUN cat <<EOF > /etc/httpd/conf.d/redirect-http-to-https.conf
+ <VirtualHost *:80>
+     DocumentRoot "/var/www/html"
+     ServerName ldap-server.work.gd
 
-#     <Directory "/var/www/html">
-#         AllowOverride All
-#         Require all granted
-#     </Directory>
+     <Directory "/var/www/html">
+         AllowOverride All
+         Require all granted
+     </Directory>
 
-#     Redirect permanent / https://ldap-server.work.gd/
+     Redirect permanent / https://ldap-server.work.gd/
 
-#     ErrorLog /var/log/httpd/http_error.log
-#     CustomLog /var/log/httpd/http_access.log combined
-# </VirtualHost>
-# EOF
+     ErrorLog /var/log/httpd/http_error.log
+     CustomLog /var/log/httpd/http_access.log combined
+</VirtualHost>
+EOF
 
 # Exponer los puertos 80
 EXPOSE 80 443 389 636
