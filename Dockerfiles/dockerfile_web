@@ -79,9 +79,21 @@ RUN cat <<EOF > /etc/httpd/conf.d/ssl-vhost.conf
         Require all granted
     </Directory>
 
+    <Location "/protegido">
+        AuthType Basic
+        AuthName "LDAP Authentication"
+        AuthBasicProvider ldap
+        AuthLDAPURL "ldap://ldap-server.work.gd:389/ou=empleados,dc=ldap-server,dc=work,dc=gd?uid"
+        AuthLDAPBindDN "cn=admin,dc=ldap-server,dc=work,dc=gd"
+        AuthLDAPBindPassword "admin"
+        Require valid-user
+        ErrorDocument 401 /error.html
+    </Location>
+
     ErrorLog /var/log/httpd/ssl_error.log
     CustomLog /var/log/httpd/ssl_access.log combined
 </VirtualHost>
+
 EOF
 
 # Redirigir HTTP a HTTPS en el puerto 80
