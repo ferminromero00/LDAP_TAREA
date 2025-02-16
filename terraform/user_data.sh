@@ -9,10 +9,13 @@ sudo mkdir /var/ldap
 
 cd /var
 sudo git clone https://github.com/ferminromero00/LDAP_TAREA.git
+# Mover archivos necesarios
 sudo mv LDAP_TAREA/Dockerfiles/dockerfile_web web
 sudo mv LDAP_TAREA/Dockerfiles/dockerfile_ldap ldap
 sudo mv LDAP_TAREA/Dockerfiles/usuario1.ldif ldap
 sudo mv LDAP_TAREA/Dockerfiles/ou_empleados.ldif ldap
+
+# Mover certificados
 sudo mv LDAP_TAREA/Certificates/ca_bundle.crt web
 sudo mv LDAP_TAREA/Certificates/certificate.crt web
 sudo mv LDAP_TAREA/Certificates/private.key web
